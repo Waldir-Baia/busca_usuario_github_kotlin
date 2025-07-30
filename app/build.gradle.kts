@@ -51,4 +51,9 @@ dependencies {
     //Dagger Hilt
     implementation(libs.dagger.hilt)
     ksp(libs.hilt.compiler)
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
 }
