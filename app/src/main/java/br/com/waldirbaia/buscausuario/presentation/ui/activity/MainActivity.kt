@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         if(!::userAdapter.isInitialized){
             userAdapter = UserAdapter(object : UserClickedListener{
                 override fun onUserClicked(viewUser: User) {
+
                 }
             })
             binding.mainRecyclerview.adapter = userAdapter
