@@ -1,10 +1,11 @@
-package br.com.waldirbaia.buscausuario
+package br.com.waldirbaia.buscausuario.presentation.ui.activity
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import br.com.waldirbaia.buscausuario.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
