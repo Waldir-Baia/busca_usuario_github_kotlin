@@ -7,3 +7,5 @@
 # 2° Requisições HTTP. A ideia e utilizar o Retrofit para realizar as chamadas a minha API. 
 
 # 3° Utilização do Hilt, para realizar a injeção de dependencia no codigo. Controlando a instancia de cada classe. 
+
+# 4° Utilizando o Diff para otimizar minha recycler. 
