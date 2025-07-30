@@ -22,13 +22,17 @@ class MainActivityViewModel @Inject constructor(
     val erro: LiveData<String?> = _erro
 
     init {
+
+    }
+
+    fun preparedData(userName: String){
         viewModelScope.launch {
-            importUser()
+            importUser(userName)
         }
     }
 
-    private suspend fun importUser() {
-        val response = repository.getUser("octocat")
+    private suspend fun importUser(nameUser: String) {
+        val response = repository.getUser(nameUser)
         if (response.isSuccessful) {
             val result = response.body()
             if (result != null) {

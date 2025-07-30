@@ -1,11 +1,10 @@
 package br.com.waldirbaia.buscausuario.presentation.ui.activity
 
 import android.os.Bundle
+import androidx.appcompat.widget.SearchView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.com.waldirbaia.buscausuario.R
 import br.com.waldirbaia.buscausuario.databinding.ActivityMainBinding
@@ -32,6 +31,28 @@ class MainActivity : AppCompatActivity() {
         binding.mainRecyclerview.layoutManager = LinearLayoutManager(this)
 
         configureObservers()
+
+        val searchMenuItem = binding.mainBottomAppbar.menu.findItem(R.id.action_search)
+        val searchView = searchMenuItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextChange(newText: String?): Boolean {
+//                newText?.let {
+//                    viewModel.preparedData(it)
+//                }
+                return true
+            }
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    viewModel.preparedData(it)
+                }
+                return true
+            }
+
+        })
+
+
     }
 
     private fun configureObservers(){
