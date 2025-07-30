@@ -48,7 +48,6 @@ class UserAdapter(
 
     }
 
-
     class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val txtUserName: TextView = itemView.findViewById(R.id.txt_card_user_name)
         val txtUserBio: TextView = itemView.findViewById(R.id.txt_card_user_bio)
