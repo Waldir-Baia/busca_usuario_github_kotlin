@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
             .commit()
 
 
-
         val searchMenuItem = binding.mainBottomAppbar.menu.findItem(R.id.action_search)
         val searchView = searchMenuItem.actionView as SearchView
 
@@ -53,7 +52,5 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
-
-
     }
 }

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.fragment.app.activityViewModels
+import br.com.waldirbaia.buscausuario.R
 import br.com.waldirbaia.buscausuario.databinding.FragmentSearchUserBinding
 import br.com.waldirbaia.buscausuario.domain.entity.User
 import br.com.waldirbaia.buscausuario.presentation.ui.adapter.UserAdapter
@@ -41,7 +42,11 @@ class SearchUserFragment : Fragment() {
     private fun setupRecyclerView() {
         userAdapter = UserAdapter(object : UserClickedListener {
             override fun onUserClicked(viewUser: User) {
-
+                val detailUserFragment = DetailUserFragment()
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, detailUserFragment)
+                    .addToBackStack(null)
+                    .commit()
             }
         })
         binding.recyclerViewUsers.adapter = userAdapter
