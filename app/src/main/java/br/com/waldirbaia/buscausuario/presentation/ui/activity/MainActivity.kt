@@ -10,7 +10,7 @@ import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.com.waldirbaia.buscausuario.R
 import br.com.waldirbaia.buscausuario.databinding.ActivityMainBinding
-import br.com.waldirbaia.buscausuario.domain.TipoFiltro
+import br.com.waldirbaia.buscausuario.domain.enums.TipoFiltro
 import br.com.waldirbaia.buscausuario.domain.entity.User
 import br.com.waldirbaia.buscausuario.presentation.ui.adapter.UserAdapter
 import br.com.waldirbaia.buscausuario.presentation.ui.fragment.HistoryFragment
@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
-                    viewModel.preparedData(it)
+                    viewModel.preparedDataa(it)
                 }
                 return true
             }
@@ -95,33 +95,12 @@ class MainActivity : AppCompatActivity() {
             .setTitle("Filtrar busca")
             .setItems(opcoes) { _, index ->
                 val tipoSelecionado = TipoFiltro.values()[index]
-                processarFiltroSelecionado(tipoSelecionado)
+                viewModel.setTipoEnum(tipoSelecionado)
             }
             .setNegativeButton("Cancelar", null)
             .show()
     }
 
-    private fun processarFiltroSelecionado(tipo: TipoFiltro) {
-        when (tipo) {
-            TipoFiltro.LOCALIZACAO -> filtrarPorLocalizacao()
-            TipoFiltro.LINGUAGEM -> filtrarPorLinguagem()
-            TipoFiltro.SEGUIDORES -> ordenarPorSeguidores()
-            TipoFiltro.REPOSITORIOS -> ordenarPorRepositorios()
-        }
-    }
-
-    private fun filtrarPorLocalizacao() {
-    }
-
-    private fun filtrarPorLinguagem() {
-    }
-
-    private fun ordenarPorSeguidores() {
-    }
-
-    private fun ordenarPorRepositorios() {
-
-    }
 
 
 }

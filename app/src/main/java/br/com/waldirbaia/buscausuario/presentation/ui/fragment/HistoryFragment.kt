@@ -60,7 +60,7 @@ class HistoryFragment : Fragment() {
     private fun setupRecyclerView() {
         historyAdapter = HistoryAdapter(object : HistoryClickedListener {
             override fun onHistoryClicked(viewHistory: HistoryUser) {
-                mainViewModel.preparedData(viewHistory.user.toString())
+                mainViewModel.preparedDataa(viewHistory.user.toString())
                 val searchUser = SearchUserFragment()
                 requireActivity().supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, searchUser)

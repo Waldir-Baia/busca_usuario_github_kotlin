@@ -1,6 +1,7 @@
 package br.com.waldirbaia.buscausuario.presentation.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +41,9 @@ class SearchUserFragment : Fragment() {
     private fun setupRecyclerView() {
         userAdapter = UserAdapter(object : UserClickedListener {
             override fun onUserClicked(viewUser: User) {
+                viewModel.setUserSelected(viewUser)
+                viewModel.addHistory(viewUser)
+                viewModel.importRepository(viewUser.login.toString())
                 val detailUserFragment = DetailUserFragment()
                 requireActivity().supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, detailUserFragment)
@@ -53,9 +57,13 @@ class SearchUserFragment : Fragment() {
 
     private fun configureObservers() {
         viewModel.user.observe(viewLifecycleOwner) { result ->
-            val listUser = if (result != null) listOf(result) else emptyList()
-            userAdapter.submitList(listUser)
+            userAdapter.submitList(result.filterNotNull())
         }
+
+//        viewModel.listUser.observe(viewLifecycleOwner) { result ->
+//            userAdapter.submitList(result)
+//            Log.d("Wbn_ResponseListUser", "${result}")
+//        }
     }
 
     override fun onDestroyView() {

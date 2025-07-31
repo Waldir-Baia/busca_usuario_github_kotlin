@@ -68,7 +68,7 @@ class DetailUserFragment : Fragment() {
             repositoryAdapter.submitList(result)
         }
 
-        viewModel.user.observe(viewLifecycleOwner){result ->
+        viewModel.userSelected.observe(viewLifecycleOwner){result ->
             updateUI(result)
         }
     }

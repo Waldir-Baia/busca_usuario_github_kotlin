@@ -6,13 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.waldirbaia.buscausuario.data.local.interfac.HistoryRepository
-import br.com.waldirbaia.buscausuario.domain.TipoFiltro
+import br.com.waldirbaia.buscausuario.domain.enums.TipoFiltro
 import br.com.waldirbaia.buscausuario.domain.entity.HistoryUser
 import br.com.waldirbaia.buscausuario.domain.entity.Repository
 import br.com.waldirbaia.buscausuario.domain.entity.User
 import br.com.waldirbaia.buscausuario.domain.repository.MainActivityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import retrofit2.Response
 import java.util.Date
 import javax.inject.Inject
 
@@ -22,8 +23,14 @@ class MainActivityViewModel @Inject constructor(
     private val historyRepository: HistoryRepository
 ) : ViewModel() {
 
-    private val _user = MutableLiveData<User?>()
-    val user: LiveData<User?> = _user
+    private val _user = MutableLiveData<List<User?>>()
+    val user: LiveData<List<User?>> = _user
+
+    private val _userSelected = MutableLiveData<User?>()
+    val userSelected: LiveData<User?> = _userSelected
+
+    private val _listUser = MutableLiveData<List<User?>>()
+    val listUser: LiveData<List<User?>> = _listUser
 
     private val _repositoryEntity = MutableLiveData<List<Repository>>()
     val repositoryEntity: LiveData<List<Repository>> = _repositoryEntity
@@ -40,6 +47,10 @@ class MainActivityViewModel @Inject constructor(
     init {
 
     }
+    fun setUserSelected(user: User?){
+        _userSelected.value = user
+
+    }
 
     fun preparedDataa(search: String) {
         viewModelScope.launch {
@@ -47,12 +58,13 @@ class MainActivityViewModel @Inject constructor(
 
             when (tipoFiltro) {
                 TipoFiltro.USUARIO -> {
-                    _user.value = importUser(search)
-                    _repositoryEntity.value = importRepository(search)
+                    val user = importUser(search)
+                    _user.value = listOf(user)
+                   // _repositoryEntity.value = importRepository(search)
                 }
 
                 TipoFiltro.LINGUAGEM -> {
-
+                    _user.value = importUsersByLanguage(search)
                 }
 
                 TipoFiltro.SEGUIDORES -> {
@@ -60,7 +72,7 @@ class MainActivityViewModel @Inject constructor(
                 }
 
                 TipoFiltro.LOCALIZACAO -> {
-
+                    _user.value = importUsersByLocation(search)
                 }
 
                 TipoFiltro.REPOSITORIOS -> {
@@ -73,16 +85,16 @@ class MainActivityViewModel @Inject constructor(
     fun preparedData(userName: String) {
         viewModelScope.launch {
             importUser(userName)
-            _repositoryEntity.value = importRepository(userName)
+            importRepository(userName)
         }
     }
 
-    fun atualizaFiltroSelecionado(tipo: TipoFiltro) {
+    fun setTipoEnum(tipo: TipoFiltro) {
         _filtroSelecionado.value = tipo
 
     }
 
-    private fun addHistory(user: User) {
+    fun addHistory(user: User) {
         val history = HistoryUser(
             idUser = user.id,
             user = user.login,
@@ -108,7 +120,7 @@ class MainActivityViewModel @Inject constructor(
                         avatar_url = result.avatar_url,
                         repos_url = result.repos_url
                     )
-                    addHistory(user)
+                    _user.value = listOf(user)
                     return user
                 }
             } else {
@@ -120,30 +132,87 @@ class MainActivityViewModel @Inject constructor(
             null
         }
     }
-
-    private suspend fun importRepository(userName: String): List<Repository> {
+    fun importRepository(userName: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getRepository(userName)
+                if (response.isSuccessful) {
+                    response.body()?.let { responseList ->
+                        val listRepository = responseList.map { repoResponse ->
+                            Repository(
+                                id = repoResponse.id,
+                                name = repoResponse.name,
+                                full_name = repoResponse.full_name,
+                                html_url = repoResponse.html_url,
+                                description = repoResponse.description
+                            )
+                        }
+                        _repositoryEntity.value = listRepository
+                    } ?: run {
+                        _repositoryEntity.value = emptyList()
+                    }
+                } else {
+                    _erro.postValue(response.errorBody()?.string() ?: "Erro desconhecido")
+                    _repositoryEntity.value = emptyList()
+                }
+            } catch (e: Exception) {
+                _erro.postValue(e.message ?: "Erro inesperado")
+                _repositoryEntity.value = emptyList()
+            }
+        }
+    }
+    private suspend fun importUsersByLanguage(name:String) : List<User?>{
         return try {
-            val response = repository.getRepository(userName)
-
-            if (response.isSuccessful) {
-                response.body()?.let { responseList ->
-                    val listRepository = responseList.map { repoResponse ->
-                        Repository(
-                            id = repoResponse.id,
-                            name = repoResponse.name,
-                            full_name = repoResponse.full_name,
-                            html_url = repoResponse.html_url,
-                            description = repoResponse.description
+            val response = repository.getRepositoriesByLanguage(name)
+            if (response.isSuccessful){
+                response.body()?.let { result ->
+                    val listRepository = result.items.map { users ->
+                        User(
+                            id = users.id,
+                            login = users.login,
+                            bio = users.bio,
+                            location = users.location,
+                            followers = users.followers,
+                            avatar_url = users.avatar_url,
+                            repos_url = users.repos_url
                         )
                     }
                     return listRepository
                 }
-            } else {
+            }else{
                 _erro.value = response.errorBody()?.string() ?: "Erro desconhecido"
             }
             emptyList()
-        } catch (e: Exception) {
-            _erro.value = e.message ?: "Erro inesperado"
+        }catch (e: Exception){
+            _erro.value = e.toString()
+            emptyList()
+        }
+    }
+
+    private suspend fun importUsersByLocation(name:String) : List<User?>{
+        return try {
+            val response = repository.getUsersByLocation(name)
+            if (response.isSuccessful){
+                response.body()?.let { result ->
+                    val listRepository = result.items.map { users ->
+                        User(
+                            id = users.id,
+                            login = users.login,
+                            bio = users.bio,
+                            location = users.location,
+                            followers = users.followers,
+                            avatar_url = users.avatar_url,
+                            repos_url = users.repos_url
+                        )
+                    }
+                    return listRepository
+                }
+            }else{
+                _erro.value = response.errorBody()?.string() ?: "Erro desconhecido"
+            }
+            emptyList()
+        }catch (e: Exception){
+            _erro.value = e.toString()
             emptyList()
         }
     }
