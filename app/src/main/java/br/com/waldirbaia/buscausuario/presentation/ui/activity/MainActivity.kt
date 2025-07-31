@@ -10,6 +10,7 @@ import br.com.waldirbaia.buscausuario.R
 import br.com.waldirbaia.buscausuario.databinding.ActivityMainBinding
 import br.com.waldirbaia.buscausuario.domain.entity.User
 import br.com.waldirbaia.buscausuario.presentation.ui.adapter.UserAdapter
+import br.com.waldirbaia.buscausuario.presentation.ui.fragment.SearchUserFragment
 import br.com.waldirbaia.buscausuario.presentation.ui.listener.UserClickedListener
 import br.com.waldirbaia.buscausuario.presentation.viewmodel.MainActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,9 +28,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.mainRecyclerview.layoutManager = LinearLayoutManager(this)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, SearchUserFragment())
+            .commit()
 
-        configureObservers()
+
 
         val searchMenuItem = binding.mainBottomAppbar.menu.findItem(R.id.action_search)
         val searchView = searchMenuItem.actionView as SearchView
@@ -53,28 +56,4 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-
-    private fun configureObservers(){
-        viewModel.user.observe(this){result ->
-            updateUIResult(listOf(result))
-        }
-    }
-
-    private fun updateUIResult(listUser: List<User?>){
-        if(!::userAdapter.isInitialized){
-            userAdapter = UserAdapter(object : UserClickedListener{
-                override fun onUserClicked(viewUser: User) {
-
-                }
-            })
-            binding.mainRecyclerview.adapter = userAdapter
-        }
-        userAdapter.submitList(listUser)
-    }
-
-
-
-
-
-
 }
