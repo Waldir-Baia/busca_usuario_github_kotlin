@@ -13,4 +13,10 @@
         android:icon="@drawable/icon_baseline_filter_list"
         app:showAsAction="always|collapseActionView" />
 
+    <item
+        android:id="@+id/action_history"
+        android:title="History"
+        android:icon="@drawable/icon_outline_history"
+        app:showAsAction="always|collapseActionView" />
+
 </menu>

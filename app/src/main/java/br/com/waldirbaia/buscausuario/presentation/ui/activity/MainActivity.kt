@@ -10,6 +10,7 @@ import br.com.waldirbaia.buscausuario.R
 import br.com.waldirbaia.buscausuario.databinding.ActivityMainBinding
 import br.com.waldirbaia.buscausuario.domain.entity.User
 import br.com.waldirbaia.buscausuario.presentation.ui.adapter.UserAdapter
+import br.com.waldirbaia.buscausuario.presentation.ui.fragment.HistoryFragment
 import br.com.waldirbaia.buscausuario.presentation.ui.fragment.SearchUserFragment
 import br.com.waldirbaia.buscausuario.presentation.ui.listener.UserClickedListener
 import br.com.waldirbaia.buscausuario.presentation.viewmodel.MainActivityViewModel
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val searchMenuItem = binding.mainBottomAppbar.menu.findItem(R.id.action_search)
         val searchView = searchMenuItem.actionView as SearchView
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
 //                newText?.let {
 //                    viewModel.preparedData(it)
@@ -52,5 +53,23 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+
+        binding.mainBottomAppbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_filter -> {
+                    true
+                }
+
+                R.id.action_history -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, HistoryFragment())
+                        .addToBackStack(null)
+                        .commit()
+                    true
+                }
+                else -> false
+            }
+        }
+
     }
 }
