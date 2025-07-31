@@ -5,6 +5,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.com.waldirbaia.buscausuario.R
 import br.com.waldirbaia.buscausuario.databinding.ActivityMainBinding
@@ -28,6 +30,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.isAppearanceLightStatusBars = true
+
+        @Suppress("DEPRECATION")
+        window.statusBarColor = ContextCompat.getColor(this, R.color.white)
+
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, SearchUserFragment())

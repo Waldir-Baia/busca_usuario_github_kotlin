@@ -19,9 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class SearchUserFragment : Fragment() {
     private var _binding: FragmentSearchUserBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var userAdapter: UserAdapter
-
     private val viewModel: MainActivityViewModel by activityViewModels()
 
     override fun onCreateView(

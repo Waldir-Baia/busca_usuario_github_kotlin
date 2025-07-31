@@ -9,11 +9,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import br.com.waldirbaia.buscausuario.R
 import br.com.waldirbaia.buscausuario.databinding.FragmentDetailUserBinding
 import br.com.waldirbaia.buscausuario.domain.entity.Repository
+import br.com.waldirbaia.buscausuario.domain.entity.User
 import br.com.waldirbaia.buscausuario.presentation.ui.adapter.RepositoryAdapter
 import br.com.waldirbaia.buscausuario.presentation.ui.listener.RepositoryClickedListener
 import br.com.waldirbaia.buscausuario.presentation.viewmodel.MainActivityViewModel
+import coil.load
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,6 +39,14 @@ class DetailUserFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.mainToolbar.setNavigationOnClickListener {
+            val searchUser = SearchUserFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, searchUser)
+                .addToBackStack(null)
+                .commit()
+        }
+
         setupRecyclerView()
         configureObservers()
     }
@@ -55,6 +66,19 @@ class DetailUserFragment : Fragment() {
     private fun configureObservers(){
         viewModel.repositoryEntity.observe(viewLifecycleOwner){result ->
             repositoryAdapter.submitList(result)
+        }
+
+        viewModel.user.observe(viewLifecycleOwner){result ->
+            updateUI(result)
+        }
+    }
+
+    private fun updateUI(user: User?){
+        binding.userName.text = user?.login
+        binding.userImage.load(user?.avatar_url){
+            crossfade(true)
+            placeholder(R.drawable.icon_outline_person)
+            error(R.drawable.icon_outline_person)
         }
     }
 

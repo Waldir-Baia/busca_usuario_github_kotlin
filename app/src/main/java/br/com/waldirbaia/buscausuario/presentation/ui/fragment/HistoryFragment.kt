@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,6 +43,15 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.mainToolbar.setNavigationOnClickListener {
+            val searchUser = SearchUserFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, searchUser)
+                .addToBackStack(null)
+                .commit()
+        }
+
         setupRecyclerView()
         configureObservers()
 
@@ -51,6 +61,11 @@ class HistoryFragment : Fragment() {
         historyAdapter = HistoryAdapter(object : HistoryClickedListener {
             override fun onHistoryClicked(viewHistory: HistoryUser) {
                 mainViewModel.preparedData(viewHistory.user.toString())
+                val searchUser = SearchUserFragment()
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, searchUser)
+                    .addToBackStack(null)
+                    .commit()
             }
         })
         binding.fragHistoryRecyler.adapter = historyAdapter
