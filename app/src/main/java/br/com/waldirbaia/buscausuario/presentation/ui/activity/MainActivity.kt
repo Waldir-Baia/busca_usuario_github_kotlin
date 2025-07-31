@@ -10,12 +10,14 @@ import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.com.waldirbaia.buscausuario.R
 import br.com.waldirbaia.buscausuario.databinding.ActivityMainBinding
+import br.com.waldirbaia.buscausuario.domain.TipoFiltro
 import br.com.waldirbaia.buscausuario.domain.entity.User
 import br.com.waldirbaia.buscausuario.presentation.ui.adapter.UserAdapter
 import br.com.waldirbaia.buscausuario.presentation.ui.fragment.HistoryFragment
 import br.com.waldirbaia.buscausuario.presentation.ui.fragment.SearchUserFragment
 import br.com.waldirbaia.buscausuario.presentation.ui.listener.UserClickedListener
 import br.com.waldirbaia.buscausuario.presentation.viewmodel.MainActivityViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.isInitialized
 
@@ -66,19 +68,60 @@ class MainActivity : AppCompatActivity() {
         binding.mainBottomAppbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_filter -> {
+                    showDialogFilter()
                     true
                 }
 
                 R.id.action_history -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, HistoryFragment())
-                        .addToBackStack(null)
-                        .commit()
+                    navigationHistory()
                     true
                 }
                 else -> false
             }
         }
+    }
+
+    private fun navigationHistory() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, HistoryFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun showDialogFilter() {
+        val opcoes = TipoFiltro.values().map { it.descricao }.toTypedArray()
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Filtrar busca")
+            .setItems(opcoes) { _, index ->
+                val tipoSelecionado = TipoFiltro.values()[index]
+                processarFiltroSelecionado(tipoSelecionado)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun processarFiltroSelecionado(tipo: TipoFiltro) {
+        when (tipo) {
+            TipoFiltro.LOCALIZACAO -> filtrarPorLocalizacao()
+            TipoFiltro.LINGUAGEM -> filtrarPorLinguagem()
+            TipoFiltro.SEGUIDORES -> ordenarPorSeguidores()
+            TipoFiltro.REPOSITORIOS -> ordenarPorRepositorios()
+        }
+    }
+
+    private fun filtrarPorLocalizacao() {
+    }
+
+    private fun filtrarPorLinguagem() {
+    }
+
+    private fun ordenarPorSeguidores() {
+    }
+
+    private fun ordenarPorRepositorios() {
 
     }
+
+
 }

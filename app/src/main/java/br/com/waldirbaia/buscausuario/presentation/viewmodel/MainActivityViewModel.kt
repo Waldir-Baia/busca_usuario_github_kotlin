@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.waldirbaia.buscausuario.data.local.interfac.HistoryRepository
+import br.com.waldirbaia.buscausuario.domain.TipoFiltro
 import br.com.waldirbaia.buscausuario.domain.entity.HistoryUser
 import br.com.waldirbaia.buscausuario.domain.entity.Repository
 import br.com.waldirbaia.buscausuario.domain.entity.User
@@ -14,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
+
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     private val repository: MainActivityRepository,
@@ -29,6 +31,9 @@ class MainActivityViewModel @Inject constructor(
     private val _history = MutableLiveData<List<HistoryUser>>()
     val history: LiveData<List<HistoryUser>> = _history
 
+    private val _filtroSelecionado = MutableLiveData<TipoFiltro>(TipoFiltro.USUARIO)
+    val filtroSelecionado: LiveData<TipoFiltro> = _filtroSelecionado
+
     private val _erro = MutableLiveData<String?>()
     val erro: LiveData<String?> = _erro
 
@@ -36,14 +41,48 @@ class MainActivityViewModel @Inject constructor(
 
     }
 
-    fun preparedData(userName: String){
+    fun preparedDataa(search: String) {
         viewModelScope.launch {
-            importUser(userName)
-            _repositoryEntity.value =  importRepository(userName)
+            val tipoFiltro = _filtroSelecionado.value ?: TipoFiltro.USUARIO
+
+            when (tipoFiltro) {
+                TipoFiltro.USUARIO -> {
+                    _user.value = importUser(search)
+                    _repositoryEntity.value = importRepository(search)
+                }
+
+                TipoFiltro.LINGUAGEM -> {
+
+                }
+
+                TipoFiltro.SEGUIDORES -> {
+
+                }
+
+                TipoFiltro.LOCALIZACAO -> {
+
+                }
+
+                TipoFiltro.REPOSITORIOS -> {
+
+                }
+            }
         }
     }
 
-    private fun addHistory(user: User){
+    fun preparedData(userName: String) {
+        viewModelScope.launch {
+            importUser(userName)
+            _repositoryEntity.value = importRepository(userName)
+        }
+    }
+
+    fun atualizaFiltroSelecionado(tipo: TipoFiltro) {
+        _filtroSelecionado.value = tipo
+
+    }
+
+    private fun addHistory(user: User) {
         val history = HistoryUser(
             idUser = user.id,
             user = user.login,
@@ -54,30 +93,33 @@ class MainActivityViewModel @Inject constructor(
         _history.value = historyRepository.getGistory()
     }
 
-    private suspend fun importUser(userName: String) {
-        val response = repository.getUser(userName)
-        if (response.isSuccessful) {
-            val result = response.body()
-            if (result != null) {
-                val user = User(
-                    id = result.id,
-                    login = result.login,
-                    bio = result.bio,
-                    location = result.location,
-                    followers = result.followers,
-                    avatar_url = result.avatar_url,
-                    repos_url = result.repos_url
-                )
-                _user.value = user
-                addHistory(user)
+    private suspend fun importUser(userName: String): User? {
+        return try {
+            val response = repository.getUser(userName)
+            if (response.isSuccessful) {
+                val result = response.body()
+                if (result != null) {
+                    val user = User(
+                        id = result.id,
+                        login = result.login,
+                        bio = result.bio,
+                        location = result.location,
+                        followers = result.followers,
+                        avatar_url = result.avatar_url,
+                        repos_url = result.repos_url
+                    )
+                    addHistory(user)
+                    return user
+                }
+            } else {
+                Log.e("ImportUser", "Erro: ${response.code()} - ${response.message()}")
             }
-        } else {
-            Log.e("ImportUser", "Erro: ${response.code()} - ${response.message()}")
+            null
+        } catch (e: Exception) {
+            Log.e("ImportUser", "Exceção ao importar usuário", e)
+            null
         }
     }
-
-    //Neste dois metodos de importação eu mudei a forma, um vai receber o valor diretamente dentro do metodo depois que faço o mapeamento.
-    // Já neste segundo eu já declarei ele falando que ele vai me retornar uma lista de repository
 
     private suspend fun importRepository(userName: String): List<Repository> {
         return try {
